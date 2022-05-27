@@ -10,3 +10,4 @@ Most of the code comes from:
 
  - [https://vulkan-tutorial.com/Introduction](https://vulkan-tutorial.com/Introduction)
  - [https://www.youtube.com/watch?v=Y9U9IE0gVHA&list=PL8327DO66nu9qYVKLDmdLW_84-yE4auCR&index=1](https://www.youtube.com/watch?v=Y9U9IE0gVHA&list=PL8327DO66nu9qYVKLDmdLW_84-yE4auCR&index=1)
+ - [http://kylehalladay.com/blog/tutorial/2017/12/13/Custom-Allocators-Vulkan.html](http://kylehalladay.com/blog/tutorial/2017/12/13/Custom-Allocators-Vulkan.html)

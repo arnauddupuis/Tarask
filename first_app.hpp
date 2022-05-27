@@ -1,6 +1,7 @@
 #pragma once
 
 #include "tarask_device.hpp"
+#include "tarask_model.hpp"
 #include "tarask_pipeline.hpp"
 #include "tarask_swap_chain.hpp"
 #include "tarask_window.hpp"
@@ -23,6 +24,9 @@ namespace tarask
         void run();
 
     private:
+        void loadModels();
+        void sierpinski(std::vector<TaraskModel::Vertex> &vertices, int depth, glm::vec2 left,
+                        glm::vec2 right, glm::vec2 top);
         void createPipelineLayout();
         void createPipeline();
         void createCommandBuffers();
@@ -34,5 +38,6 @@ namespace tarask
         std::unique_ptr<TaraskPipeline> m_taraskPipeline;
         VkPipelineLayout m_pipelineLayout;
         std::vector<VkCommandBuffer> m_commandBuffers;
+        std::unique_ptr<TaraskModel> m_taraskModel;
     };
 } // namespace tarask

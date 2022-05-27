@@ -1,12 +1,14 @@
 #include "first_app.hpp"
 
 #include <array>
+#include <iostream>
 #include <stdexcept>
 
 namespace tarask
 {
     FirstApp::FirstApp()
     {
+        loadModels();
         createPipelineLayout();
         createPipeline();
         createCommandBuffers();
@@ -24,6 +26,36 @@ namespace tarask
         }
 
         vkDeviceWaitIdle(m_taraskDevice.device());
+    }
+
+    void FirstApp::sierpinski(std::vector<TaraskModel::Vertex> &vertices, int depth, glm::vec2 left,
+                              glm::vec2 right, glm::vec2 top)
+    {
+        if (depth <= 0)
+        {
+            vertices.push_back({top});
+            vertices.push_back({right});
+            vertices.push_back({left});
+        }
+        else
+        {
+            auto leftTop = 0.5f * (left + top);
+            auto rightTop = 0.5f * (right + top);
+            auto leftRight = 0.5f * (left + right);
+            sierpinski(vertices, depth - 1, left, leftRight, leftTop);
+            sierpinski(vertices, depth - 1, leftRight, right, rightTop);
+            sierpinski(vertices, depth - 1, leftTop, rightTop, top);
+        }
+    }
+
+    void FirstApp::loadModels()
+    {
+        std::vector<TaraskModel::Vertex> vertices = {};
+        std::cout << "Starting calculating sierpinski triangle..." << std::endl;
+        sierpinski(vertices, 8, {-0.9f, 0.9f}, {0.9f, 0.9f}, {0.0f, -0.9f});
+        std::cout << "Finished calculating sierpinski triangle..." << std::endl;
+
+        m_taraskModel = std::make_unique<TaraskModel>(m_taraskDevice, vertices);
     }
 
     void FirstApp::createPipelineLayout()
@@ -92,7 +124,8 @@ namespace tarask
 
             vkCmdBeginRenderPass(m_commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
             m_taraskPipeline->bind(m_commandBuffers[i]);
-            vkCmdDraw(m_commandBuffers[i], 3, 1, 0, 0);
+            m_taraskModel->bind(m_commandBuffers[i]);
+            m_taraskModel->draw(m_commandBuffers[i]);
 
             vkCmdEndRenderPass(m_commandBuffers[i]);
             if (vkEndCommandBuffer(m_commandBuffers[i]) != VK_SUCCESS)

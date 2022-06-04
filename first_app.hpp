@@ -31,10 +31,12 @@ namespace tarask
         void createPipeline();
         void createCommandBuffers();
         void drawFrame();
+        void recreateSwapChain();
+        void recordCommandBuffer(int imageIndex);
 
         TaraskWindow m_taraskWindow{WIDTH, HEIGHT, "Tarask Vulkan Engine"};
         TaraskDevice m_taraskDevice{m_taraskWindow};
-        TaraskSwapChain m_taraskSwapChain{m_taraskDevice, m_taraskWindow.getExtent()};
+        std::unique_ptr<TaraskSwapChain> m_taraskSwapChain;
         std::unique_ptr<TaraskPipeline> m_taraskPipeline;
         VkPipelineLayout m_pipelineLayout;
         std::vector<VkCommandBuffer> m_commandBuffers;

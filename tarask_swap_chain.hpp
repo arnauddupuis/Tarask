@@ -21,7 +21,7 @@ namespace tarask
         ~TaraskSwapChain();
 
         TaraskSwapChain(const TaraskSwapChain &) = delete;
-        void operator=(const TaraskSwapChain &) = delete;
+        TaraskSwapChain &operator=(const TaraskSwapChain &) = delete;
 
         VkFramebuffer getFrameBuffer(int index) { return swapChainFramebuffers[index]; }
         VkRenderPass getRenderPass() { return renderPass; }

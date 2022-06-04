@@ -20,14 +20,18 @@ namespace tarask
         {
             return {static_cast<uint32_t>(m_width), static_cast<uint32_t>(m_height)};
         }
+        bool wasWindowResized() { return m_framebufferResized; }
+        void resetWindowResizedFlag() { m_framebufferResized = false; }
 
         void createWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
 
     private:
+        static void framebufferResizeCallback(GLFWwindow *window, int width, int height);
         void initWindow();
 
-        const u_int32_t m_width;
-        const u_int32_t m_height;
+        u_int32_t m_width;
+        u_int32_t m_height;
+        bool m_framebufferResized = false;
 
         std::string m_title;
         GLFWwindow *m_window;

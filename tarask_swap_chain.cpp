@@ -102,7 +102,7 @@ namespace tarask
         if (vkQueueSubmit(device.graphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) !=
             VK_SUCCESS)
         {
-            throw std::runtime_error("failed to submit draw command buffer!");
+            throw std::runtime_error("TaraskSwapChain: failed to submit draw command buffer!");
         }
 
         VkPresentInfoKHR presentInfo = {};
@@ -176,7 +176,7 @@ namespace tarask
 
         if (vkCreateSwapchainKHR(device.device(), &createInfo, nullptr, &swapChain) != VK_SUCCESS)
         {
-            throw std::runtime_error("failed to create swap chain!");
+            throw std::runtime_error("TaraskSwapChain: failed to create swap chain!");
         }
 
         // we only specified a minimum number of images in the swap chain, so the implementation is
@@ -210,7 +210,7 @@ namespace tarask
             if (vkCreateImageView(device.device(), &viewInfo, nullptr, &swapChainImageViews[i]) !=
                 VK_SUCCESS)
             {
-                throw std::runtime_error("failed to create texture image view!");
+                throw std::runtime_error("TaraskSwapChain: failed to create texture image view!");
             }
         }
     }
@@ -275,7 +275,7 @@ namespace tarask
         if (vkCreateRenderPass(device.device(), &renderPassInfo, nullptr, &renderPass) !=
             VK_SUCCESS)
         {
-            throw std::runtime_error("failed to create render pass!");
+            throw std::runtime_error("TaraskSwapChain: failed to create render pass!");
         }
     }
 
@@ -299,7 +299,7 @@ namespace tarask
             if (vkCreateFramebuffer(device.device(), &framebufferInfo, nullptr,
                                     &swapChainFramebuffers[i]) != VK_SUCCESS)
             {
-                throw std::runtime_error("failed to create framebuffer!");
+                throw std::runtime_error("TaraskSwapChain: failed to create framebuffer!");
             }
         }
     }
@@ -348,7 +348,7 @@ namespace tarask
             if (vkCreateImageView(device.device(), &viewInfo, nullptr, &depthImageViews[i]) !=
                 VK_SUCCESS)
             {
-                throw std::runtime_error("failed to create texture image view!");
+                throw std::runtime_error("TaraskSwapChain: failed to create texture image view!");
             }
         }
     }
@@ -376,7 +376,8 @@ namespace tarask
                 vkCreateFence(device.device(), &fenceInfo, nullptr, &inFlightFences[i]) !=
                     VK_SUCCESS)
             {
-                throw std::runtime_error("failed to create synchronization objects for a frame!");
+                throw std::runtime_error(
+                    "TaraskSwapChain: failed to create synchronization objects for a frame!");
             }
         }
     }
@@ -403,7 +404,7 @@ namespace tarask
         {
             if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR)
             {
-                std::cout << "Present mode: Mailbox" << std::endl;
+                std::cout << "TaraskSwapChain: Present mode: Mailbox" << std::endl;
                 return availablePresentMode;
             }
         }

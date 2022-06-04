@@ -50,10 +50,14 @@ namespace tarask
 
     void FirstApp::loadModels()
     {
-        std::vector<TaraskModel::Vertex> vertices = {};
-        std::cout << "Starting calculating sierpinski triangle..." << std::endl;
-        sierpinski(vertices, 8, {-0.9f, 0.9f}, {0.9f, 0.9f}, {0.0f, -0.9f});
-        std::cout << "Finished calculating sierpinski triangle..." << std::endl;
+        std::vector<TaraskModel::Vertex> vertices = {
+            {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+            {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+            {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+        };
+        // std::cout << "Starting calculating sierpinski triangle..." << std::endl;
+        // sierpinski(vertices, 8, {-0.9f, 0.9f}, {0.9f, 0.9f}, {0.0f, -0.9f});
+        // std::cout << "Finished calculating sierpinski triangle..." << std::endl;
 
         m_taraskModel = std::make_unique<TaraskModel>(m_taraskDevice, vertices);
     }

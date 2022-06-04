@@ -33,9 +33,9 @@ namespace tarask
     {
         if (depth <= 0)
         {
-            vertices.push_back({top});
-            vertices.push_back({right});
-            vertices.push_back({left});
+            vertices.push_back({top, {1.0f, 0.0f, 0.0f}});
+            vertices.push_back({right, {0.0f, 1.0f, 0.0f}});
+            vertices.push_back({left, {0.0f, 0.0f, 1.0f}});
         }
         else
         {
@@ -51,12 +51,12 @@ namespace tarask
     void FirstApp::loadModels()
     {
         std::vector<TaraskModel::Vertex> vertices = {
-            {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-            {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-            {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+            // {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+            // {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+            // {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
         };
         // std::cout << "Starting calculating sierpinski triangle..." << std::endl;
-        // sierpinski(vertices, 8, {-0.9f, 0.9f}, {0.9f, 0.9f}, {0.0f, -0.9f});
+        sierpinski(vertices, 8, {-0.9f, 0.9f}, {0.9f, 0.9f}, {0.0f, -0.9f});
         // std::cout << "Finished calculating sierpinski triangle..." << std::endl;
 
         m_taraskModel = std::make_unique<TaraskModel>(m_taraskDevice, vertices);

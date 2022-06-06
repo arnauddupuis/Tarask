@@ -33,3 +33,5 @@
 VulkanTest
 
 .vscode/*
+
+*.spv

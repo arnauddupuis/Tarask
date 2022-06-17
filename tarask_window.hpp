@@ -29,8 +29,8 @@ namespace tarask
         static void framebufferResizeCallback(GLFWwindow *window, int width, int height);
         void initWindow();
 
-        u_int32_t m_width;
-        u_int32_t m_height;
+        int m_width;
+        int m_height;
         bool m_framebufferResized = false;
 
         std::string m_title;

@@ -19,8 +19,10 @@ namespace tarask
 
         FirstApp();
         ~FirstApp();
+
         FirstApp(const FirstApp &) = delete;
         FirstApp &operator=(const FirstApp &) = delete;
+
         void run();
 
     private:
@@ -30,6 +32,7 @@ namespace tarask
         void createPipelineLayout();
         void createPipeline();
         void createCommandBuffers();
+        void freeCommandBuffers();
         void drawFrame();
         void recreateSwapChain();
         void recordCommandBuffer(int imageIndex);

@@ -1,6 +1,7 @@
 #include "first_app.hpp"
 
 #include <array>
+#include <cassert>
 #include <iostream>
 #include <stdexcept>
 
@@ -50,13 +51,14 @@ namespace tarask
 
     void FirstApp::loadModels()
     {
-        std::vector<TaraskModel::Vertex> vertices = {
-            {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-            {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-            {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
-        };
+        // std::vector<TaraskModel::Vertex> vertices = {
+        //     {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+        //     {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+        //     {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+        // };
         // std::cout << "Starting calculating sierpinski triangle..." << std::endl;
-        // sierpinski(vertices, 8, {-0.9f, 0.9f}, {0.9f, 0.9f}, {0.0f, -0.9f});
+        std::vector<TaraskModel::Vertex> vertices = {};
+        sierpinski(vertices, 8, {-0.9f, 0.9f}, {0.9f, 0.9f}, {0.0f, -0.9f});
         // std::cout << "Finished calculating sierpinski triangle..." << std::endl;
 
         m_taraskModel = std::make_unique<TaraskModel>(m_taraskDevice, vertices);
@@ -77,28 +79,55 @@ namespace tarask
         }
     }
 
-    void FirstApp::createPipeline()
-    {
-        auto pipelineConfig = TaraskPipeline::defaultPipelineConfigInfo(
-            m_taraskSwapChain->width(), m_taraskSwapChain->height());
-        pipelineConfig.renderPass = m_taraskSwapChain->getRenderPass();
-        pipelineConfig.pipelineLayout = m_pipelineLayout;
-        m_taraskPipeline =
-            std::make_unique<TaraskPipeline>(m_taraskDevice, "shaders/simple_shader.vert.spv",
-                                             "shaders/simple_shader.frag.spv", pipelineConfig);
-    }
-
     void FirstApp::recreateSwapChain()
     {
-        auto extend = m_taraskWindow.getExtent();
-        while (extend.width == 0 || extend.height == 0)
+        auto extent = m_taraskWindow.getExtent();
+        while (extent.width == 0 || extent.height == 0)
         {
-            extend = m_taraskWindow.getExtent();
+            extent = m_taraskWindow.getExtent();
             glfwWaitEvents();
         }
         vkDeviceWaitIdle(m_taraskDevice.device());
-        m_taraskSwapChain = std::make_unique<TaraskSwapChain>(m_taraskDevice, extend);
+        if (m_taraskSwapChain == nullptr)
+        {
+            m_taraskSwapChain = std::make_unique<TaraskSwapChain>(m_taraskDevice, extent);
+        }
+        else
+        {
+            m_taraskSwapChain = std::make_unique<TaraskSwapChain>(m_taraskDevice, extent, std::move(m_taraskSwapChain));
+            if (m_taraskSwapChain->imageCount() != m_commandBuffers.size())
+            {
+                freeCommandBuffers();
+                createCommandBuffers();
+            }
+        }
+
         createPipeline();
+    }
+
+    void FirstApp::createPipeline()
+    {
+
+        assert(m_taraskSwapChain != nullptr && "Cannot create pipeline before swap chain");
+        assert(m_pipelineLayout != nullptr && "Cannot create pipeline before pipeline layout");
+
+        PipelineConfigInfo pipelineConfig{};
+        TaraskPipeline::defaultPipelineConfigInfo(pipelineConfig);
+        pipelineConfig.renderPass = m_taraskSwapChain->getRenderPass();
+        pipelineConfig.pipelineLayout = m_pipelineLayout;
+        m_taraskPipeline = std::make_unique<TaraskPipeline>(
+            m_taraskDevice,
+            "shaders/simple_shader.vert.spv",
+            "shaders/simple_shader.frag.spv",
+            pipelineConfig);
+
+        // auto pipelineConfig = TaraskPipeline::defaultPipelineConfigInfo(
+        //     m_taraskSwapChain->width(), m_taraskSwapChain->height());
+        // pipelineConfig.renderPass = m_taraskSwapChain->getRenderPass();
+        // pipelineConfig.pipelineLayout = m_pipelineLayout;
+        // m_taraskPipeline =
+        //     std::make_unique<TaraskPipeline>(m_taraskDevice, "shaders/simple_shader.vert.spv",
+        //                                      "shaders/simple_shader.frag.spv", pipelineConfig);
     }
 
     void FirstApp::createCommandBuffers()
@@ -114,6 +143,13 @@ namespace tarask
         {
             throw std::runtime_error("FirstApp: failed to allocate command buffers.");
         }
+    }
+
+    void FirstApp::freeCommandBuffers()
+    {
+        vkFreeCommandBuffers(m_taraskDevice.device(), m_taraskDevice.getCommandPool(),
+                             static_cast<uint32_t>(m_commandBuffers.size()), m_commandBuffers.data());
+        m_commandBuffers.clear();
     }
     void FirstApp::recordCommandBuffer(int imageIndex)
     {
@@ -141,6 +177,16 @@ namespace tarask
 
         vkCmdBeginRenderPass(m_commandBuffers[imageIndex], &renderPassInfo,
                              VK_SUBPASS_CONTENTS_INLINE);
+        VkViewport viewport{};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = static_cast<float>(m_taraskSwapChain->getSwapChainExtent().width);
+        viewport.height = static_cast<float>(m_taraskSwapChain->getSwapChainExtent().height);
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+        VkRect2D scissor{{0, 0}, m_taraskSwapChain->getSwapChainExtent()};
+        vkCmdSetViewport(m_commandBuffers[imageIndex], 0, 1, &viewport);
+        vkCmdSetScissor(m_commandBuffers[imageIndex], 0, 1, &scissor);
         m_taraskPipeline->bind(m_commandBuffers[imageIndex]);
         m_taraskModel->bind(m_commandBuffers[imageIndex]);
         m_taraskModel->draw(m_commandBuffers[imageIndex]);
@@ -162,7 +208,7 @@ namespace tarask
             return;
         }
 
-        std::cout << "SWAP CHAIN RECREATED" << std::endl;
+        // std::cout << "SWAP CHAIN RECREATED" << std::endl;
 
         if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
         {

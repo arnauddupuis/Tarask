@@ -6,6 +6,7 @@
 #include <vulkan/vulkan.h>
 
 // std lib headers
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -18,6 +19,7 @@ namespace tarask
         static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
         TaraskSwapChain(TaraskDevice &deviceRef, VkExtent2D windowExtent);
+        TaraskSwapChain(TaraskDevice &deviceRef, VkExtent2D windowExtent, std::shared_ptr<TaraskSwapChain> previous);
         ~TaraskSwapChain();
 
         TaraskSwapChain(const TaraskSwapChain &) = delete;
@@ -43,6 +45,7 @@ namespace tarask
         VkResult submitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex);
 
     private:
+        void init();
         void createSwapChain();
         void createImageViews();
         void createDepthResources();
@@ -73,6 +76,7 @@ namespace tarask
         VkExtent2D windowExtent;
 
         VkSwapchainKHR swapChain;
+        std::shared_ptr<TaraskSwapChain> oldSwapChain;
 
         std::vector<VkSemaphore> imageAvailableSemaphores;
         std::vector<VkSemaphore> renderFinishedSemaphores;
